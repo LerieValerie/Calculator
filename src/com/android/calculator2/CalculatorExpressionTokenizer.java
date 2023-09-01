@@ -18,6 +18,8 @@ package com.android.calculator2;
 
 import android.content.Context;
 
+import com.google.android.apps.calculator.R;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;

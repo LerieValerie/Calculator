@@ -24,11 +24,8 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.app.Activity;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -42,13 +39,20 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.android.calculator2.CalculatorEditText.OnTextSizeChangeListener;
 import com.android.calculator2.CalculatorExpressionEvaluator.EvaluateCallback;
+import com.google.android.apps.calculator.R;
 
-public class Calculator extends Activity
+public class Calculator extends AppCompatActivity
         implements OnTextSizeChangeListener, EvaluateCallback, OnLongClickListener {
 
     private static final String NAME = Calculator.class.getName();
+
+    private final CalculatorActivityEx calculatorActivityEx = new CalculatorActivityEx(Calculator.this);
 
     // instance state keys
     private static final String KEY_CURRENT_STATE = NAME + "_currentState";
@@ -74,6 +78,7 @@ public class Calculator extends Activity
 
         @Override
         public void afterTextChanged(Editable editable) {
+            calculatorActivityEx.setInputText(editable.toString());
             setState(CalculatorState.INPUT);
             mEvaluator.evaluate(editable, Calculator.this);
         }
@@ -121,6 +126,9 @@ public class Calculator extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        calculatorActivityEx.loadFeatureModule();
+        calculatorActivityEx.checkInputPasswordText();
+
         setContentView(R.layout.activity_calculator);
 
         mDisplayView = findViewById(R.id.display);
@@ -219,27 +227,17 @@ public class Calculator extends Activity
     }
 
     public void onButtonClick(View view) {
-        switch (view.getId()) {
-            case R.id.eq:
-                onEquals();
-                break;
-            case R.id.del:
-                onDelete();
-                break;
-            case R.id.clr:
-                onClear();
-                break;
-            case R.id.fun_cos:
-            case R.id.fun_ln:
-            case R.id.fun_log:
-            case R.id.fun_sin:
-            case R.id.fun_tan:
-                // Add left parenthesis after functions.
-                mFormulaEditText.append(((Button) view).getText() + "(");
-                break;
-            default:
-                mFormulaEditText.append(((Button) view).getText());
-                break;
+        int id = view.getId();
+        if (id == R.id.eq) {
+            onEquals();
+        } else if (id == R.id.del) {
+            onDelete();
+        } else if (id == R.id.clr) {
+            onClear();
+        } else if (id == R.id.fun_cos || id == R.id.fun_ln || id == R.id.fun_log || id == R.id.fun_sin || id == R.id.fun_tan) {// Add left parenthesis after functions.
+            mFormulaEditText.append(((Button) view).getText() + "(");
+        } else {
+            mFormulaEditText.append(((Button) view).getText());
         }
     }
 
